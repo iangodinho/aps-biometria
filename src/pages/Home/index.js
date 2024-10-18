@@ -1,12 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
-import useAuth from "../../hooks/useAuth";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import MenuLateral from '../../components/MenuLateral';
 import ListaGrupos from '../../components/ListaGrupos';
 import Dashboard from './Dashboard';
 import Configuracoes from './Configuracoes';
 import * as C from "./styles";
+import Signin from "../Signin";
 import styled from 'styled-components';
 
 const AppWrapper = styled.div`
@@ -19,29 +18,18 @@ const ConteudoWrapper = styled.div`
 `;
 
 const Home = () => {
-  const { signout } = useAuth();
-  const navigate = useNavigate();
-
-  return (
-    <Router>
+    return (
         <AppWrapper>
             <MenuLateral />
             <ConteudoWrapper>
                 <Routes>
-                    <Route path="/dashboard" component={Dashboard} />
-                    <Route path="/grupos" component={ListaGrupos} />
-                    <Route path="/configuracoes" component={Configuracoes} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/grupos" element={<ListaGrupos />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
+                <Route path="/" element={<Signin />} />
                 </Routes>
             </ConteudoWrapper>
         </AppWrapper>
-    </Router>
-    // <C.Container>
-    //   <C.Title>Home</C.Title>
-
-    //   <Button Text="Sair" onClick={() => [signout(), navigate("/")]}>
-    //     Sair
-    //   </Button>
-    // </C.Container>
   );
 };
 

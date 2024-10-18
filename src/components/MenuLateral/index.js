@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 const MenuWrapper = styled.div`
@@ -17,19 +17,32 @@ const MenuItem = styled.div`
   &:hover {
     background-color: #34495e;
   }
+
+  &.active {
+    border-left: 5px solid gray;
+  }
+`;
+
+const StyledNavLink = styled(NavLink)`
+  color: white;
+  text-decoration: none;
+
+  &.active {
+    border-left: 5px solid gray;
+  }
 `;
 
 const MenuLateral = () => {
   return (
     <MenuWrapper>
       <MenuItem>
-        <Link to="/dashboard" style={{ color: 'white', textDecoration: 'none' }}>Início</Link>
+        <StyledNavLink to="/dashboard">Início</StyledNavLink>
       </MenuItem>
       <MenuItem>
-        <Link to="/grupos" style={{ color: 'white', textDecoration: 'none' }}>Grupos</Link>
+        <StyledNavLink to="/grupos">Grupos</StyledNavLink>
       </MenuItem>
       <MenuItem>
-        <Link to="/configuracoes" style={{ color: 'white', textDecoration: 'none' }}>Configurações</Link>
+        <StyledNavLink to="/configuracoes">Configurações</StyledNavLink>
       </MenuItem>
     </MenuWrapper>
   );
