@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext({});
 
@@ -13,12 +13,14 @@ export const AuthProvider = ({ children }) => {
       const hasUser = JSON.parse(usersStorage)?.filter(
         (user) => user.email === JSON.parse(userToken).email
       );
+
       if (hasUser) setUser(hasUser[0]);
     }
   }, []);
 
   const signin = (email, password) => {
     const usersStorage = JSON.parse(localStorage.getItem("users_bd"));
+
     const hasUser = usersStorage?.filter((user) => user.email === email);
 
     if (hasUser?.length) {
@@ -35,15 +37,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = (email, password) => {
+  const signup = (email, password, role) => {
     const usersStorage = JSON.parse(localStorage.getItem("users_bd"));
+
     const hasUser = usersStorage?.filter((user) => user.email === email);
+
+    if (!role) {
+      return "Por favor, selecione um cargo.";
+    }
 
     if (hasUser?.length) {
       return "Já tem uma conta com esse E-mail";
     }
 
     let newUser;
+
     if (usersStorage) {
       newUser = [...usersStorage, { email, password }];
     } else {
@@ -51,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     localStorage.setItem("users_bd", JSON.stringify(newUser));
+
     return;
   };
 
@@ -60,11 +69,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signed: !!user, signin, signup, signout }}>
+    <AuthContext.Provider
+      value={{ user, signed: !!user, signin, signup, signout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
-

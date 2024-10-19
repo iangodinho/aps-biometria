@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from "../../../components/Button";
-import { useAuth } from "../../../contexts/auth.js";
+import useAuth from "../../../hooks/useAuth.js";
 import { useNavigate } from 'react-router-dom';
 
 const Configuracoes = () => {
@@ -10,7 +10,7 @@ const Configuracoes = () => {
 
   const handleLogout = () => {
     signout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (

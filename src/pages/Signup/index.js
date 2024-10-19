@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Input from "../../components/Input";
+import Select from "../../components/Select";
 import Button from "../../components/Button";
 import * as C from "./styles";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,12 +11,14 @@ const Signup = () => {
   const [emailConf, setEmailConf] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
+  const [role, setRole] = useState('');
   const navigate = useNavigate();
+  const roles = ['Diretor', 'Coordenador', 'Analista'];
 
   const { signup } = useAuth();
 
   const handleSignup = () => {
-    if (!email | !emailConf | !senha) {
+    if (!email | !emailConf | !senha | !role) {
       setError("Preencha todos os campos");
       return;
     } else if (email !== emailConf) {
@@ -23,7 +26,7 @@ const Signup = () => {
       return;
     }
 
-    const res = signup(email, senha);
+    const res = signup(email, senha, role);
 
     if (res) {
       setError(res);
@@ -36,7 +39,7 @@ const Signup = () => {
 
   return (
     <C.Container>
-      <C.Label>SISTEMA DE LOGIN</C.Label>
+      <C.Label>SISTEMA DE CADASTRO</C.Label>
       <C.Content>
         <Input
           type="email"
@@ -49,6 +52,11 @@ const Signup = () => {
           placeholder="Confirme seu E-mail"
           value={emailConf}
           onChange={(e) => [setEmailConf(e.target.value), setError("")]}
+        />
+        <Select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        options={roles}
         />
         <Input
           type="password"

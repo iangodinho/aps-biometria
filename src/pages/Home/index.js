@@ -26,7 +26,6 @@ const Home = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/grupos" element={<ListaGrupos />} />
                 <Route path="/configuracoes" element={<Configuracoes />} />
-                <Route path="/" element={<Signin />} />
                 </Routes>
             </ConteudoWrapper>
         </AppWrapper>
