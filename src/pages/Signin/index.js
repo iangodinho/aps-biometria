@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import Input from "../../components/Input";
-import Button from "../../components/Button";
+import ButtonForm from "../../components/ButtonForm";
+import CheckboxRemember from "../../components/CheckboxRemember";
+import ContainerForm from "../../components/ContainerForm";
+import Logo from "../../components/Logo";
+import Content from "../../components/Content";
+import FormBox from "../../components/FormBox";
+import Label from "../../components/Label";
+import Strong from "../../components/Strong";
+import ImageBox from "../../components/ImageBox";
+import LabelError from "../../components/LabelError";
 import * as C from "./styles";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import logo from "../../img/logo.png";
-import image from "../../img/img-borda.png";
 
 const Signin = () => {
   const { signin } = useAuth();
@@ -32,16 +39,16 @@ const Signin = () => {
   };
 
   return (
-<C.Container>
-      <C.Logo src={logo} alt="Logo" />  {/* Adicione o logo aqui */}
-      <C.Content>
-        <C.FormBox>
-          <C.Label>Login no sistema</C.Label>
+    <ContainerForm>
+      <Logo/>
+      <Content>
+        <FormBox>
+          <Label>Login no sistema</Label>
           <C.LabelSignup>
-            Por favor, insira suas informações para fazer o login no sistema, ou 
-            <C.Strong>
+            Por favor, insira suas informações para fazer o login no sistema, ou
+            <Strong>
               <Link to="/signup"> clique aqui </Link>
-            </C.Strong>
+            </Strong>
             para se registrar
           </C.LabelSignup>
           <Input
@@ -56,18 +63,15 @@ const Signin = () => {
             value={senha}
             onChange={(e) => [setSenha(e.target.value), setError("")]}
           />
-          <C.CheckboxContainer>
-            <input type="checkbox" id="lembrar" />
-            <label htmlFor="lembrar">Lembrar de mim</label>
-          </C.CheckboxContainer>
-          <C.labelError>{error}</C.labelError>
-          <C.Button onClick={handleLogin}> 
-          Entrar
-          </C.Button>
-        </C.FormBox>
-        <C.ImageBox src={image} alt="Imagem" />
-      </C.Content>
-    </C.Container>
+          <CheckboxRemember id="lembrar" label="Lembrar de mim" />
+          <LabelError>{error}</LabelError>
+          <ButtonForm onClick={handleLogin}>
+            Entrar
+          </ButtonForm>
+        </FormBox>
+        <ImageBox/>
+      </Content>
+    </ContainerForm>
   );
 };
 

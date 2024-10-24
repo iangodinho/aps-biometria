@@ -3,17 +3,21 @@ import styled from "styled-components";
 export const Select = styled.select`
   outline: none;
   width: 100%;
-  padding: 16px 20px;
+  padding: 12px 0px;
   border: none;
-  border-radius: 5px;
-  background-color: #f0f2f5;
-  font-size: 16px;
-  appearance: none; /* Para remover o estilo padrão do navegador */
+  border-bottom: 1px solid #202020;
+  background-color: transparent;
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #757575;
   cursor: pointer;
   &.active {
     border-left: 5px solid gray;
   }
-  &:hover {
-    background-color: #f0f0f0;
+  option {
+    color: black; /* Cor das opções */
+  }
+  option:disabled {
+    color: #A2A2A2; /* Cor das opções */
   }
 `

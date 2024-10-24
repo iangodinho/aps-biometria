@@ -1,7 +1,7 @@
 import React from "react";
 import { StyledButton } from "./styles";
 
-const Button = ({ Text, onClick }) => {
+const ButtonExit = ({ Text, onClick }) => {
   return (
     <StyledButton type="button" onClick={onClick}>
       {Text}
@@ -9,4 +9,4 @@ const Button = ({ Text, onClick }) => {
   );
 };
 
-export default Button;
+export default ButtonExit;

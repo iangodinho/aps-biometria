@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
+import Search from "../BarraBusca";
 import {
   TableWrapper,
   TableContainer,
-  SearchBarWrapper,
-  SearchBar,
   Table,
   TableRow,
   TableHeader,
@@ -14,12 +13,11 @@ import {
   RowsPerPageSelector,
   PaginationTextWrapper
 } from './styles'; // Importando os estilos
-import lupaIcon from '../../img/search.png'; // Importando a imagem da lupa
 
 const ListaGrupos = () => {
   const grupos = ['Administrador', 'Diretor', 'Analista', 'Suporte', 'TI'];
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [selectedItems, setSelectedItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const filteredGrupos = grupos.filter(grupo =>
@@ -66,15 +64,7 @@ const ListaGrupos = () => {
   return (
     <TableContainer>
       <TableWrapper>
-        <SearchBarWrapper>
-          <img src={lupaIcon} alt="Buscar" style={{ marginRight: '10px', width: '20px' }} />
-          <SearchBar
-            type="text"
-            placeholder="Buscar..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </SearchBarWrapper>
+        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <Table>
           <thead>
             <TableRow>

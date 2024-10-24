@@ -1,6 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-import Button from "../../../components/Button";
+import ButtonExit from "../../../components/ButtonExit/index.js";
 import useAuth from "../../../hooks/useAuth.js";
 import { useNavigate } from 'react-router-dom';
 
@@ -16,9 +15,9 @@ const Configuracoes = () => {
   return (
     <div>
       <h1>Configurações</h1>
-      <Button Text="Sair" onClick={handleLogout}>
+      <ButtonExit Text="Sair" onClick={handleLogout}>
         Sair
-      </Button>
+      </ButtonExit>
     </div>
   );
 };

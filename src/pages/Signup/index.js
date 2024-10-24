@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import Input from "../../components/Input";
 import Select from "../../components/Select";
-import Button from "../../components/Button";
-import * as C from "./styles";
-import { Link, useNavigate } from "react-router-dom";
+import ButtonForm from "../../components/ButtonForm";
+import ContainerForm from "../../components/ContainerForm";
+import Logo from "../../components/Logo";
+import Content from "../../components/Content";
+import FormBox from "../../components/FormBox";
+import Label from "../../components/Label";
+import Strong from "../../components/Strong";
+import ImageBox from "../../components/ImageBox";
+import LabelError from "../../components/LabelError";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import * as C from "./styles";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -38,42 +46,46 @@ const Signup = () => {
   };
 
   return (
-    <C.Container>
-      <C.Label>SISTEMA DE CADASTRO</C.Label>
-      <C.Content>
-        <Input
-          type="email"
-          placeholder="Digite seu E-mail"
-          value={email}
-          onChange={(e) => [setEmail(e.target.value), setError("")]}
-        />
-        <Input
-          type="email"
-          placeholder="Confirme seu E-mail"
-          value={emailConf}
-          onChange={(e) => [setEmailConf(e.target.value), setError("")]}
-        />
-        <Select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        options={roles}
-        />
-        <Input
-          type="password"
-          placeholder="Digite sua Senha"
-          value={senha}
-          onChange={(e) => [setSenha(e.target.value), setError("")]}
-        />
-        <C.labelError>{error}</C.labelError>
-        <Button Text="Inscrever-se" onClick={handleSignup} />
-        <C.LabelSignin>
-          Já tem uma conta?
-          <C.Strong>
-            <Link to="/">&nbsp;Entre</Link>
-          </C.Strong>
-        </C.LabelSignin>
-      </C.Content>
-    </C.Container>
+    <ContainerForm>
+      <Logo/>
+      <Content>
+        <FormBox>
+          <Label>Cadastro no sistema</Label>
+          <Input
+            type="email"
+            placeholder="Digite seu E-mail*"
+            value={email}
+            onChange={(e) => [setEmail(e.target.value), setError("")]}
+          />
+          <Input
+            type="email"
+            placeholder="Confirme seu E-mail*"
+            value={emailConf}
+            onChange={(e) => [setEmailConf(e.target.value), setError("")]}
+          />
+          <Select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            options={roles}
+          />
+          <Input
+            type="password"
+            placeholder="Digite sua Senha*"
+            value={senha}
+            onChange={(e) => [setSenha(e.target.value), setError("")]}
+          />
+          <LabelError>{error}</LabelError>
+          <ButtonForm onClick={handleSignup}>
+            Cadastrar
+          </ButtonForm>
+          <C.LabelSignin>
+            Já tem uma conta?
+            <Strong to="/signin">&nbsp;Entre</Strong>
+          </C.LabelSignin>
+        </FormBox>
+        <ImageBox/>
+      </Content>
+    </ContainerForm>
   );
 };
 
