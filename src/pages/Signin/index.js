@@ -89,14 +89,19 @@ const Signin = () => {
         console.log("Verificação da digital bem-sucedida.");
         return true;
       } else {
-        const errorText = await response.text();
-        console.error("Erro na verificação da digital:", errorText);
-        setError(errorText || "Falha na verificação da digital");
-        return false;
+        // Tenta obter a mensagem de erro como texto
+        let errorMessage = "Falha na verificação da digital";
+        try {
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        } catch (e) {
+          console.error("Erro ao obter mensagem de erro:", e);
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Erro ao verificar a digital no backend:", error);
-      setError("Erro ao verificar a digital");
+      setError(error.message || "Erro ao verificar a digital");
       return false;
     }
   };
@@ -156,7 +161,7 @@ const Signin = () => {
             break;
           } else {
             console.log("Digital não verificada.");
-            // Não fecha a porta; permite nova tentativa
+            // Permite nova tentativa sem reiniciar a conexão
             break;
           }
         }
