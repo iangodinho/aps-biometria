@@ -36,7 +36,6 @@ const Signin = () => {
 
       const data = await response.json();
       console.log("Token recebido:", data.jwtToken);
-      localStorage.setItem("token", data.jwtToken);
       return { token: data.jwtToken };
     } catch (error) {
       console.error("Erro ao conectar com o backend:", error);
@@ -58,42 +57,19 @@ const Signin = () => {
     }
   };
 
-  const readData = async (selectedPort, token) => {
-    const decoder = new TextDecoderStream();
-    selectedPort.readable.pipeTo(decoder.writable);
-    const reader = decoder.readable.getReader();
-
-    setIsReading(true);
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-          console.log("Leitura da porta serial encerrada.");
-          break;
+  const closeSerialPort = async () => {
+    if (portRef.current) {
+      try {
+        // Fecha o writer se estiver aberto
+        if (portRef.current.writable) {
+          await portRef.current.writable.getWriter().close();
         }
-        if (value) {
-          const parsedId = parseInt(value.trim());
-          console.log("Valor lido da porta:", parsedId);
-
-          // Verifica a digital imediatamente após a leitura
-          const verified = await verifyFingerprintWithBackend(token, parsedId);
-          if (verified) {
-            console.log("Acesso liberado!");
-            navigate("/dashboard");
-            break;
-          } else {
-            setError("Falha na verificação da digital");
-            // Permite nova tentativa sem reiniciar a conexão
-            break;
-          }
-        }
+        // Fecha a porta serial
+        await portRef.current.close();
+        console.log("Porta serial fechada.");
+      } catch (error) {
+        console.error("Erro ao fechar a porta serial:", error);
       }
-    } catch (error) {
-      console.error("Erro ao ler da porta serial:", error);
-      setError("Erro ao ler do dispositivo");
-    } finally {
-      reader.releaseLock();
-      setIsReading(false);
     }
   };
 
@@ -122,6 +98,90 @@ const Signin = () => {
       console.error("Erro ao verificar a digital no backend:", error);
       setError("Erro ao verificar a digital");
       return false;
+    }
+  };
+
+  const readData = async (selectedPort, token) => {
+    try {
+      // Verifica se o stream já está travado e libera se necessário
+      if (selectedPort.readable.locked) {
+        console.log("Stream já está em uso. Liberando o stream anterior...");
+        if (selectedPort.reader) {
+          await selectedPort.reader.cancel();
+          selectedPort.reader.releaseLock();
+          selectedPort.reader = null;
+        }
+        if (selectedPort.decoder) {
+          await selectedPort.decoder.readable.cancel();
+          await selectedPort.decoder.writable.getWriter().close();
+          selectedPort.decoder = null;
+        }
+      }
+
+      const decoder = new TextDecoderStream();
+      selectedPort.decoder = decoder;
+      const readableStreamClosed = selectedPort.readable
+        .pipeTo(decoder.writable)
+        .catch((err) => {
+          console.error("Erro no pipeTo:", err);
+        });
+      const reader = decoder.readable.getReader();
+      selectedPort.reader = reader;
+
+      setIsReading(true);
+      console.log("Iniciando leitura da digital...");
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          console.log("Leitura da porta serial encerrada.");
+          break;
+        }
+        if (value) {
+          const parsedId = parseInt(value.trim());
+          console.log("Valor lido da porta:", parsedId);
+
+          if (isNaN(parsedId)) {
+            console.error("ID da digital inválido:", value);
+            setError("ID da digital inválido recebido.");
+            continue; // Continua lendo
+          }
+
+          const verified = await verifyFingerprintWithBackend(token, parsedId);
+          if (verified) {
+            console.log("Acesso liberado!");
+            await closeSerialPort();
+            setIsReading(false); // Atualiza antes de navegar
+            navigate("/dashboard");
+            break;
+          } else {
+            console.log("Digital não verificada.");
+            // Não fecha a porta; permite nova tentativa
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao ler da porta serial:", error);
+      setError("Erro ao ler do dispositivo");
+    } finally {
+      if (selectedPort.reader) {
+        selectedPort.reader.releaseLock();
+        selectedPort.reader = null;
+      }
+
+      if (selectedPort.decoder) {
+        try {
+          await selectedPort.decoder.readable.cancel();
+          await selectedPort.decoder.writable.getWriter().close();
+        } catch (e) {
+          console.error("Erro ao fechar o decoder:", e);
+        }
+        selectedPort.decoder = null;
+      }
+
+      // Não aguardamos o pipeTo aqui para evitar promessas pendentes
+      setIsReading(false);
     }
   };
 
@@ -197,8 +257,12 @@ const Signin = () => {
           <CheckboxRemember id="lembrar" label="Lembrar de mim" />
           <LabelError>{error}</LabelError>
           <div style={{ display: "flex", gap: "8px" }}>
-            <ButtonForm onClick={handleLogin}>Entrar</ButtonForm>
-            <ButtonForm onClick={connectSerialPort}>Conectar</ButtonForm>
+            <ButtonForm onClick={handleLogin} disabled={isReading}>
+              Entrar
+            </ButtonForm>
+            <ButtonForm onClick={connectSerialPort} disabled={isReading}>
+              Conectar
+            </ButtonForm>
           </div>
         </FormBox>
         <ImageBox />
