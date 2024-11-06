@@ -10,7 +10,7 @@ import speedometerGrayIcon from '../../img/speedometer-gray.svg'; // Ícone cinz
 import speedometerBlueIcon from '../../img/speedometer-blue.svg'; // Ícone azul para Dashboard
 
 const MenuLateral = () => {
-  const location = useLocation(); // Hook do React Router para verificar a rota atual
+  const location = useLocation();
 
   // Verifica se o usuário está nas páginas
   const isDashboardActive = location.pathname === '/dashboard';
@@ -26,7 +26,7 @@ const MenuLateral = () => {
       <C.MenuItem>
         <C.StyledNavLink to="/dashboard">
           <img
-            src={isDashboardActive ? speedometerBlueIcon : speedometerGrayIcon} // Ícone dinâmico para Dashboard
+            src={isDashboardActive ? speedometerBlueIcon : speedometerGrayIcon}
             alt="Ícone de Dashboard"
             width="20"
             height="20"
@@ -38,29 +38,29 @@ const MenuLateral = () => {
 
       <C.CategoryTitle>SEGURANÇA</C.CategoryTitle>
       <C.MenuItem>
-        <C.StyledNavLink to="/grupos">
+        <C.StyledNavLink to="/posts">
           <img
-            src={isGruposActive ? lockBlueIcon : lockGrayIcon} // Ícone dinâmico para Grupos
+            src={isGruposActive ? lockBlueIcon : lockGrayIcon}
             alt="Ícone de Grupos"
             width="20"
             height="20"
             style={{ marginRight: '10px' }}
           />
-          Grupos
+          Criar Post
         </C.StyledNavLink>
       </C.MenuItem>
 
       <C.CategoryTitle>SISTEMA</C.CategoryTitle>
       <C.MenuItem>
-        <C.StyledNavLink to="/configuracoes">
+        <C.StyledNavLink to="/signup">
           <img
-            src={isConfigActive ? gearBlueIcon : gearGrayIcon} // Ícone dinâmico para Configurações
+            src={isConfigActive ? gearBlueIcon : gearGrayIcon}
             alt="Ícone de Configurações"
             width="20"
             height="20"
             style={{ marginRight: '10px' }}
           />
-          Configurações
+          Criar Usuário
         </C.StyledNavLink>
       </C.MenuItem>
     </C.MenuWrapper>

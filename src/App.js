@@ -5,6 +5,7 @@ import GlobalStyle from './styles/global.js';
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import Poc from './pages/poc';
 import styled from 'styled-components';
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
           <Routes>
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/poc" element={<Poc />} />
             <Route path="/*" element={<Home />} />
           </Routes>
         </Router>

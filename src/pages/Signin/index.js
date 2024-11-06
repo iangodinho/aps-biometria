@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import ButtonForm from "../../components/ButtonForm";
 import Input from "../../components/Input";
 import CheckboxRemember from "../../components/CheckboxRemember";
@@ -16,67 +16,18 @@ import { Link, useNavigate } from "react-router-dom";
 const Signin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [fingerprintId, setFingerprintId] = useState(null);
+  const [isReading, setIsReading] = useState(false);
+  const portRef = useRef(null);
   const navigate = useNavigate();
-  let port = null; // Variável para armazenar a porta serial
 
-  useEffect(() => {
-    const readData = async () => {
-      if (port && port.readable) {
-        const decoder = new TextDecoderStream();
-        const readableStreamClosed = port.readable.pipeTo(decoder.writable);
-        const reader = decoder.readable.getReader();
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) {
-            break;
-          }
-          const parsedId = parseInt(value.trim().replace("ID ", ""));
-          if (!isNaN(parsedId)) {
-            setFingerprintId(parsedId);
-          }
-        }
-      }
-    };
-
-    readData().catch(error => {
-      console.error("Erro na leitura da porta serial:", error);
-    });
-
-    return () => {
-      if (port && port.readable) {
-        port.close().catch(error => {
-          console.error("Erro ao fechar a porta serial:", error);
-        });
-      }
-    };
-  }, [port]);
-
-  // Função para conectar à porta serial
-  const connectSerialPort = async () => {
-    try {
-      const ports = await navigator.serial.getPorts();
-      port = await navigator.serial.requestPort(); // Solicita uma porta específica
-      await port.open({ baudRate: 9600 }); // Abre a porta
-      setError(""); // Limpa qualquer erro anterior
-    } catch (error) {
-      console.error("Erro ao conectar à porta serial:", error);
-      setError("Erro ao conectar ao dispositivo de leitura");
-    }
-  };
-
-  // Função para autenticar o usuário
-  const signin = async (username, password) => {
+  const login = async (username, password) => {
     try {
       const response = await fetch("http://localhost:8080/login/auth", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({username,password}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
@@ -84,31 +35,89 @@ const Signin = () => {
       }
 
       const data = await response.json();
-      return { token: data.token };
+      console.log("Token recebido:", data.jwtToken);
+      localStorage.setItem("token", data.jwtToken);
+      return { token: data.jwtToken };
     } catch (error) {
       console.error("Erro ao conectar com o backend:", error);
       return { error: error.message };
     }
   };
 
-  // Função para verificar a digital com o backend
-  const verifyFingerprintWithBackend = async (token, fingerprintId) => {
+  const connectSerialPort = async () => {
     try {
+      console.log("Solicitando conexão com a porta serial...");
+      const selectedPort = await navigator.serial.requestPort();
+      await selectedPort.open({ baudRate: 9600 });
+      portRef.current = selectedPort;
+      console.log("Conexão com porta serial estabelecida.");
+      setError(""); // Limpa erros anteriores
+    } catch (error) {
+      console.error("Erro ao conectar à porta serial:", error);
+      setError("Erro ao conectar ao dispositivo de leitura");
+    }
+  };
+
+  const readData = async (selectedPort, token) => {
+    const decoder = new TextDecoderStream();
+    selectedPort.readable.pipeTo(decoder.writable);
+    const reader = decoder.readable.getReader();
+
+    setIsReading(true);
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          console.log("Leitura da porta serial encerrada.");
+          break;
+        }
+        if (value) {
+          const parsedId = parseInt(value.trim());
+          console.log("Valor lido da porta:", parsedId);
+
+          // Verifica a digital imediatamente após a leitura
+          const verified = await verifyFingerprintWithBackend(token, parsedId);
+          if (verified) {
+            console.log("Acesso liberado!");
+            navigate("/dashboard");
+            break;
+          } else {
+            setError("Falha na verificação da digital");
+            // Permite nova tentativa sem reiniciar a conexão
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao ler da porta serial:", error);
+      setError("Erro ao ler do dispositivo");
+    } finally {
+      reader.releaseLock();
+      setIsReading(false);
+    }
+  };
+
+  const verifyFingerprintWithBackend = async (token, biometricId) => {
+    try {
+      console.log("Enviando ID da digital para verificação no backend...");
       const response = await fetch("http://localhost:8080/user/verify", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ fingerprintId }),
+        body: JSON.stringify({ biometricId }),
       });
 
-      if (!response.ok) {
-        throw new Error("Erro na verificação da digital");
+      if (response.ok) {
+        console.log("Verificação da digital bem-sucedida.");
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error("Erro na verificação da digital:", errorText);
+        setError(errorText || "Falha na verificação da digital");
+        return false;
       }
-
-      const result = await response.json();
-      return result.verified;
     } catch (error) {
       console.error("Erro ao verificar a digital no backend:", error);
       setError("Erro ao verificar a digital");
@@ -116,31 +125,27 @@ const Signin = () => {
     }
   };
 
-  // Função para lidar com o login
   const handleLogin = async () => {
     if (!username || !password) {
       setError("Preencha todos os campos");
       return;
     }
 
-    const res = await signin(username, password);
+    if (!portRef.current) {
+      setError("Conecte o dispositivo antes de fazer login");
+      return;
+    }
+
+    const res = await login(username, password);
     if (res.error) {
       setError(res.error);
       return;
     }
 
-    localStorage.setItem("token", res.token);
+    setError("Aguardando leitura da digital...");
 
-    // Verifica a digital se ela estiver disponível
-    if (fingerprintId !== null) {
-      const verified = await verifyFingerprintWithBackend(res.token, fingerprintId);
-      if (verified) {
-        navigate("/dashboard"); // Redireciona após sucesso
-      } else {
-        setError("Falha na verificação da digital");
-      }
-    } else {
-      setError("Aguardando leitura da digital...");
+    if (!isReading) {
+      await readData(portRef.current, res.token);
     }
   };
 
@@ -169,7 +174,7 @@ const Signin = () => {
           <div style={{ position: "relative" }}>
             <Input
               type={showPassword ? "text" : "password"}
-              placeholder="Digite sua password"
+              placeholder="Digite sua senha"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -192,12 +197,8 @@ const Signin = () => {
           <CheckboxRemember id="lembrar" label="Lembrar de mim" />
           <LabelError>{error}</LabelError>
           <div style={{ display: "flex", gap: "8px" }}>
-            <ButtonForm onClick={handleLogin}>
-              Entrar
-            </ButtonForm>
-            <ButtonForm onClick={connectSerialPort}>
-              Conectar
-            </ButtonForm>
+            <ButtonForm onClick={handleLogin}>Entrar</ButtonForm>
+            <ButtonForm onClick={connectSerialPort}>Conectar</ButtonForm>
           </div>
         </FormBox>
         <ImageBox />
