@@ -60,15 +60,48 @@ const Signin = () => {
   const closeSerialPort = async () => {
     if (portRef.current) {
       try {
+        // Verifica se o stream está travado antes de tentar fechá-lo
+        if (
+          portRef.current.readable.locked ||
+          portRef.current.writable.locked
+        ) {
+          console.log("Stream ainda está travado. Tentando liberar...");
+          const writer = portRef.current.writable.getWriter();
+          await writer.close();
+        }
+
         // Fecha o writer se estiver aberto
         if (portRef.current.writable) {
-          await portRef.current.writable.getWriter().close();
+          const writer = portRef.current.writable.getWriter();
+          await writer.close();
         }
-        // Fecha a porta serial
-        await portRef.current.close();
-        console.log("Porta serial fechada.");
+
+        // Fecha a porta serial se não estiver mais travada
+        if (
+          !portRef.current.readable.locked &&
+          !portRef.current.writable.locked
+        ) {
+          await portRef.current.close();
+          console.log("Porta serial fechada.");
+        } else {
+          console.log(
+            "Porta serial ainda está travada e não pode ser fechada agora."
+          );
+        }
       } catch (error) {
-        console.error("Erro ao fechar a porta serial:", error);
+        // Ignora erros específicos relacionados a streams travados
+        if (
+          error.message.includes("Cannot cancel a locked stream") ||
+          error.message.includes(
+            "Cannot create writer when WritableStream is locked"
+          )
+        ) {
+          console.warn(
+            "Tentativa de fechar um stream já travado. Este erro pode ser ignorado."
+          );
+        } else {
+          console.error("Erro ao fechar a porta serial:", error);
+        }
       }
     }
   };
@@ -128,7 +161,11 @@ const Signin = () => {
       const readableStreamClosed = selectedPort.readable
         .pipeTo(decoder.writable)
         .catch((err) => {
-          console.error("Erro no pipeTo:", err);
+          if (err !== undefined) {
+            console.error("Erro no pipeTo:", err);
+          }
+          // Opcional: Remover o link do decoder se ocorrer um erro
+          selectedPort.decoder = null;
         });
       const reader = decoder.readable.getReader();
       selectedPort.reader = reader;
@@ -177,10 +214,25 @@ const Signin = () => {
 
       if (selectedPort.decoder) {
         try {
-          await selectedPort.decoder.readable.cancel();
-          await selectedPort.decoder.writable.getWriter().close();
+          // Verifica se o decoder não está mais travado antes de fechar
+          if (!selectedPort.decoder.readable.locked) {
+            await selectedPort.decoder.readable.cancel();
+            await selectedPort.decoder.writable.getWriter().close();
+          }
         } catch (e) {
-          console.error("Erro ao fechar o decoder:", e);
+          // Ignora erros específicos relacionados a streams travados
+          if (
+            e.message.includes(
+              "Cannot create writer when WritableStream is locked"
+            ) ||
+            e.message.includes("Cannot cancel a locked stream")
+          ) {
+            console.warn(
+              "Tentativa de fechar um decoder já travado. Este erro pode ser ignorado."
+            );
+          } else {
+            console.error("Erro ao fechar o decoder:", e);
+          }
         }
         selectedPort.decoder = null;
       }
