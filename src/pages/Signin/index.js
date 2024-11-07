@@ -259,6 +259,8 @@ const Signin = () => {
       return;
     }
 
+    localStorage.setItem("token", res.token);
+
     setError("Aguardando leitura da digital...");
 
     if (!isReading) {
