@@ -14,7 +14,7 @@ const MenuLateral = () => {
 
   // Verifica se o usuário está nas páginas
   const isDashboardActive = location.pathname === '/dashboard';
-  const isGruposActive = location.pathname === '/grupos';
+  const isGruposActive = location.pathname === '/posts';
   const isConfigActive = location.pathname === '/configuracoes';
 
   return (
@@ -36,7 +36,7 @@ const MenuLateral = () => {
         </C.StyledNavLink>
       </C.MenuItem>
 
-      <C.CategoryTitle>SEGURANÇA</C.CategoryTitle>
+      <C.CategoryTitle>PUBLICAR</C.CategoryTitle>
       <C.MenuItem>
         <C.StyledNavLink to="/posts">
           <img

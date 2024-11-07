@@ -3,6 +3,7 @@ import { Route, Routes,  } from "react-router-dom";
 import MenuLateral from '../../components/MenuLateral';
 import Header from '../../components/Header';
 import Dashboard from './Dashboard';
+import CreatePostPage from './CreatePosts';
 import styled from 'styled-components';
 
 const AppWrapper = styled.div`
@@ -18,16 +19,17 @@ const ConteudoWrapper = styled.div`
 `;
 
 const Home = () => {
-    return (
-        <AppWrapper>
-            <MenuLateral />
-            <ConteudoWrapper>
-              <Header />
-              <Routes>
-                <Route path="/dashboard" element={<Dashboard/>} />
-              </Routes>
-            </ConteudoWrapper>
-        </AppWrapper>
+  return (
+    <AppWrapper>
+      <MenuLateral />
+      <ConteudoWrapper>
+        <Header />
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/posts" element={<CreatePostPage />} /> 
+        </Routes>
+      </ConteudoWrapper>
+    </AppWrapper>
   );
 };
 

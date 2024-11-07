@@ -2,11 +2,17 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/auth.js';
 import GlobalStyle from './styles/global.js';
+import useAuth from "./hooks/useAuth.js";
 import Signin from './pages/Signin';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
-import Poc from './pages/poc';
 import styled from 'styled-components';
+
+const Private = ({ Item }) => {
+  const { signed } = useAuth();
+
+  return signed > 0 ? <Item /> : <Signin />;
+};
 
 const App = () => {
     return (
@@ -14,10 +20,10 @@ const App = () => {
         <GlobalStyle />
         <Router>
           <Routes>
+            <Route exact path="/home" element={<Private Item={Home} />} />
             <Route path="/signin" element={<Signin />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/poc" element={<Poc />} />
-            <Route path="/*" element={<Home />} />
+            <Route exact path="/signup" element={<Private Item={Signup} />} />
+            <Route path="*" element={<Signin />} />
           </Routes>
         </Router>
       </AuthProvider>

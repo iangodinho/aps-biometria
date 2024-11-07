@@ -18,7 +18,6 @@ const fetchPostsFromBackend = async (token) => {
     const result = await response.json();
     return result.content;
   } catch (error) {
-    console.log(error)
     console.error("Erro ao buscar posts do backend:", error);
     return null; 
   }
@@ -47,8 +46,6 @@ const Dashboard = () => {
     };
 
     loadPosts();
-
-    return ()=>{}
   }, [token]);
 
   if (loading) return <p>Carregando posts...</p>;
@@ -65,10 +62,8 @@ const Dashboard = () => {
         <div>
           {posts.length > 0 ? (
             posts.map((data, index) => {
-              console.log(data)
-              const {post} = data
-              console.log(post)
-              return <CardPost key={index} title={post.title} content={post.content} />
+              const { title, content } = data;
+              return <CardPost key={index} title={title} content={content} />;
             })
           ) : (
             <p>Nenhum post encontrado.</p>
