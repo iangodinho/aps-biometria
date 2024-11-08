@@ -8,7 +8,6 @@ import FormBox from "../../components/FormBox";
 import Label from "../../components/Label";
 import ImageBox from "../../components/ImageBox";
 import LabelError from "../../components/LabelError";
-import * as C from "./styles";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {

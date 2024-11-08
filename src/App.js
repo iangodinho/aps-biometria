@@ -1,27 +1,33 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './contexts/auth.js';
-import GlobalStyle from './styles/global.js';
-import Signin from './pages/Signin';
-import Signup from './pages/Signup';
-import Home from './pages/Home';
-import Poc from './pages/poc';
-import styled from 'styled-components';
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/auth";
+import GlobalStyle from "./styles/global";
+import Signin from "./pages/Signin";
+import Signup from "./pages/Signup";
+import Home from "./pages/Home";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 
 const App = () => {
-    return (
-      <AuthProvider>
+  return (
+    <AuthProvider>
+      <Router>
         <GlobalStyle />
-        <Router>
-          <Routes>
-            <Route path="/signin" element={<Signin />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/poc" element={<Poc />} />
-            <Route path="/*" element={<Home />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    );
-  };
-  
-  export default App
+        <Routes>
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/*"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+};
+
+export default App;
