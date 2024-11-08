@@ -11,6 +11,7 @@ const ButtonExit = ({ Text }) => {
     signout();  // Chame a função signout para realizar o logout
     navigate("/signin");  // Redirecione para a página de signin
     window.location.reload();  // Recarrega a página automaticamente
+    localStorage.clear();;  // Limpa o localStorage
   };
 
   return (

@@ -275,11 +275,7 @@ const Signin = () => {
         <FormBox>
           <Label>Login no sistema</Label>
           <C.LabelSignup>
-            Por favor, insira suas informações para fazer o login no sistema, ou
-            <Strong>
-              <Link to="/signup"> clique aqui </Link>
-            </Strong>
-            para se registrar
+            Por favor, insira suas informações para fazer o login no sistema.
           </C.LabelSignup>
           <Input
             type="text"
