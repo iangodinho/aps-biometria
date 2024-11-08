@@ -1,13 +1,13 @@
 import React, { useState, useRef } from "react";
-import ButtonForm from "../../components/ButtonForm";
-import Input from "../../components/Input";
-import ContainerForm from "../../components/ContainerForm";
-import Logo from "../../components/Logo";
-import Content from "../../components/Content";
-import FormBox from "../../components/FormBox";
-import Label from "../../components/Label";
-import ImageBox from "../../components/ImageBox";
-import LabelError from "../../components/LabelError";
+import ButtonForm from "../../../components/ButtonForm";
+import Input from "../../../components/Input";
+import ContainerForm from "../../../components/ContainerForm";
+import Logo from "../../../components/Logo";
+import Content from "../../../components/Content";
+import FormBox from "../../../components/FormBox";
+import Label from "../../../components/Label";
+import ImageBox from "../../../components/ImageBox";
+import LabelError from "../../../components/LabelError";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
@@ -153,7 +153,7 @@ const Signup = () => {
             console.log("Usuário cadastrado com sucesso!");
             await closeSerialPort();
             setIsReading(false);
-            navigate("/dashboard");
+            alert("Usuário cadastrado com sucesso!");
             break;
           } else {
             console.log("Falha ao cadastrar usuário.");

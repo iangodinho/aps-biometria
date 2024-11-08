@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 import Dashboard from "./Dashboard";
 import styled from "styled-components";
 import CreatePostPage from "./CreatePost";
+import Signup from "./Signup";
 
 const AppWrapper = styled.div`
   display: flex;
@@ -28,6 +29,7 @@ const Home = () => {
         <Routes>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="posts" element={<CreatePostPage />} />
+          <Route path="signup" element={<Signup />} />
           {/* Outras rotas dentro de Home */}
         </Routes>
       </ConteudoWrapper>
