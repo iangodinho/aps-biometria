@@ -42,6 +42,9 @@ const CreatePost = () => {
 
       if (response.ok) {
         alert("Post criado com sucesso!");
+        setTitle("")
+        setContent("")
+        setAccessLevel("Usuário")
       } else {
         alert("Erro ao criar post");
       }

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import * as C from "./styles";
 import ButtonForm from "../../../components/ButtonForm";
 import Input from "../../../components/Input";
 import ContainerForm from "../../../components/ContainerForm";
@@ -154,6 +155,10 @@ const Signup = () => {
             await closeSerialPort();
             setIsReading(false);
             alert("Usuário cadastrado com sucesso!");
+            setError("");
+            setUsername("");
+            setPassword("");
+            setAccessLevel("");
             break;
           } else {
             console.log("Falha ao cadastrar usuário.");
@@ -257,7 +262,6 @@ const Signup = () => {
 
   return (
     <ContainerForm>
-      <Logo />
       <Content>
         <FormBox>
           <Label>Cadastrar novo usuário</Label>
@@ -284,16 +288,17 @@ const Signup = () => {
               onClick={() => setShowPassword(!showPassword)}
               style={{
                 position: "absolute",
-                right: "10px",
+                left: "100%",
                 top: "50%",
                 transform: "translateY(-50%)",
                 cursor: "pointer",
+                width: "100%",
               }}
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
-          <select
+          <C.Select
             value={accessLevel}
             onChange={(e) => {
               setAccessLevel(e.target.value);
@@ -307,7 +312,7 @@ const Signup = () => {
             </option>
             <option value="Diretor de Divisão">Diretor de Divisão</option>
             <option value="Usuário">Usuário</option>
-          </select>
+          </C.Select>
           <LabelError>{error}</LabelError>
           <div style={{ display: "flex", gap: "8px" }}>
             <ButtonForm onClick={handleSignup} disabled={isReading}>
